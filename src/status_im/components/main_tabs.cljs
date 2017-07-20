@@ -9,6 +9,7 @@
             [status-im.components.tabs.bottom-shadow :refer [bottom-shadow-view]]
             [status-im.chats-list.screen :refer [chats-list]]
             [status-im.discover.screen :refer [discover]]
+            [status-im.ui.screens.wallet.token-data.views :as token-data-views]
             [status-im.contacts.views :refer [contact-list]]
             [status-im.components.tabs.tabs :refer [tabs]]
             [status-im.components.tabs.styles :as st]
@@ -108,7 +109,7 @@
                         :ref                    #(reset! main-swiper %)
                         :on-momentum-scroll-end (on-scroll-end swiped? scroll-ended @view-id)})
               [chats-list]
-              [discover (= @view-id :discover)]
+              [token-data-views/screen (= @view-id :discover)]
               [contact-list (= @view-id :contact-list)]]
              [tabs {:selected-view-id @view-id
                     :prev-view-id     @prev-view-id
