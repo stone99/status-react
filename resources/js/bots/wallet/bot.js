@@ -460,6 +460,12 @@ function shortPreviewSend(params, context) {
 
 var send = {
     name: "send",
+    scope: {
+        isGlobal: true,
+        personalChats: true,
+        groupChats: true,
+        canUseForDApps: false
+    },
     icon: "money_white",
     color: "#5fc48d",
     title: I18n.t('send_title'),
@@ -493,6 +499,12 @@ var paramsRequest = [
 
 status.command({
     name: "request",
+    scope: {
+        isGlobal: true,
+        personalChats: true,
+        groupChats: true,
+        canUseForDApps: false
+    },
     color: "#5fc48d",
     title: I18n.t('request_title'),
     description: I18n.t('request_description'),

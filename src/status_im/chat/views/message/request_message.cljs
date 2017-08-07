@@ -9,7 +9,7 @@
                                                 touchable-highlight]]
             [status-im.chat.styles.message.message :as st]
             [status-im.accessibility-ids :as id]
-            [status-im.models.commands :refer [parse-command-request]]
+            [status-im.chat.models.commands :as commands]
             [status-im.components.animation :as anim]
             [taoensso.timbre :as log]))
 
@@ -57,6 +57,7 @@
        #(reset! loop? false)
        :reagent-render
        (fn [message-id {command-icon :icon :as command} on-press-handler]
+         (log/debug "ALWX command" command)
          (when command
            [touchable-highlight
             {:on-press            on-press-handler
@@ -76,7 +77,7 @@
       (let [commands @commands-atom
             {:keys        [prefill prefill-bot-db prefillBotDb params]
              text-content :text} content
-            {:keys [command content]} (parse-command-request commands content)
+            {:keys [command content]} (commands/parse-command-request commands content)
             command  (if (and params command)
                        (merge command {:prefill        prefill
                                        :prefill-bot-db (or prefill-bot-db prefillBotDb)})

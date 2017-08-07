@@ -1,10 +1,8 @@
 (ns status-im.chat.handlers
   (:require-macros [cljs.core.async.macros :as am])
   (:require [re-frame.core :refer [enrich after debug dispatch reg-fx]]
-            [status-im.models.commands :as commands]
             [clojure.string :as string]
             [status-im.components.styles :refer [default-chat-color]]
-            [status-im.chat.models.suggestions :as suggestions]
             [status-im.chat.constants :as chat-consts]
             [status-im.protocol.core :as protocol]
             [status-im.data-store.chats :as chats]
@@ -28,7 +26,7 @@
             [status-im.utils.types :refer [json->clj]]
             [status-im.chat.utils :refer [console? not-console? safe-trim]]
             [status-im.utils.gfycat.core :refer [generate-gfy]]
-            status-im.chat.events.input 
+            status-im.chat.events.input
             status-im.chat.events.commands
             status-im.chat.handlers.animation
             status-im.chat.handlers.requests
@@ -186,7 +184,7 @@
 (defn load-messages!
   ([db] (load-messages! db nil))
   ([{:keys [current-chat-id] :as db} _]
-   (let [messages (messages/get-by-chat-id current-chat-id)] 
+   (let [messages (messages/get-by-chat-id current-chat-id)]
      (assoc db :messages messages))))
 
 (defn init-chat
@@ -459,6 +457,7 @@
         (when dapp-url
           (am/go
             (dispatch [:select-chat-input-command
+                       ;; TODO(alwx): !!
                        (assoc (:browse global-commands) :prefill [dapp-url])
                        nil
                        true])

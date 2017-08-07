@@ -53,6 +53,6 @@
     (bots-constants/mailman-bot? bot)
     (str const/command-char name)
 
-    bot (str const/bot-char bot)
+    bot (str const/bot-char name)
 
     :else (str const/command-char name)))

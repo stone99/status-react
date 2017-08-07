@@ -35,6 +35,7 @@
                     :prefill        prefill
                     :prefill-bot-db prefillBotDb}
                    {:command (:name command)
+                    :scope   (:scope scope)
                     :params  params})
         content' (assoc content :handler-data handler-data
                                 :type (name (:type command))

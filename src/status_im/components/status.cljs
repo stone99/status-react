@@ -142,7 +142,7 @@
       #(do
          (log/debug :call-jail :jail-id jail-id)
          (log/debug :call-jail :path path)
-         ;; this debug message can contain sensetive info
+         ;; this debug message can contain sensitive info
          #_(log/debug :call-jail :params params)
          (let [params' (update params :context assoc
                                :debug js/goog.DEBUG

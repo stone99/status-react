@@ -209,7 +209,7 @@
 
 (defn- prepare-default-contacts-events [contacts default-contacts]
   [[:add-contacts
-    (for [[id {:keys [name photo-path public-key add-chat? global-command
+    (for [[id {:keys [name photo-path public-key add-chat?
                       dapp? dapp-url dapp-hash bot-url unremovable?]}] default-contacts
           :let [id' (clojure.core/name id)]
           :when (not (get contacts id'))]
@@ -222,7 +222,6 @@
        :dapp?            dapp?
        :dapp-url         (:en dapp-url)
        :bot-url          bot-url
-       :global-command   global-command
        :dapp-hash        dapp-hash})]])
 
 (defn- prepare-add-chat-events [contacts default-contacts]
@@ -266,17 +265,8 @@
   [(inject-cofx ::get-all-contacts)]
   (fn [{:keys [db all-contacts]} _]
     (let [contacts-list (map #(vector (:whisper-identity %) %) all-contacts)
-          global-commands (->> contacts-list
-                               (filter (fn [[_ c]] (:global-command c)))
-                               (map (fn [[id {:keys [global-command]}]]
-                                      [(keyword id) (-> global-command
-                                                        (update :params (comp vec vals))
-                                                        (assoc :bot id
-                                                               :type :command))]))
-                               (into {}))
           contacts (into {} contacts-list)]
-      {:db         (assoc db :contacts/contacts contacts
-                             :global-commands global-commands)
+      {:db         (assoc db :contacts/contacts contacts)
        :dispatch-n (mapv (fn [_ contact] [:watch-contact contact]) contacts)})))
 
 (register-handler-fx
@@ -288,17 +278,8 @@
                              (map #(update-pending-status contacts %))
                              (remove #(identities (:whisper-identity %)))
                              (map #(vector (:whisper-identity %) %))
-                             (into {}))
-          global-commands (->> new-contacts'
-                               (keep (fn [[n {:keys [global-command]}]]
-                                       (when global-command
-                                         [(keyword n) (assoc global-command
-                                                        :type :command
-                                                        :bot n)])))
-                               (into {}))]
-      {:db              (-> db
-                            (update :global-commands merge global-commands)
-                            (update :contacts/contacts merge new-contacts'))
+                             (into {}))]
+      {:db              (update db :contacts/contacts merge new-contacts')
        ::save-contacts! (vals new-contacts')})))
 
 (register-handler-db
