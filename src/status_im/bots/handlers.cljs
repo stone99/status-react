@@ -1,5 +1,5 @@
 (ns status-im.bots.handlers
-  (:require [re-frame.core :as re-frame]
+  (:require [re-frame.core :as re-frame] 
             [status-im.components.status :as status]
             [status-im.utils.handlers :as u]))
 
@@ -36,12 +36,6 @@
                               [::calculated-subscription {:bot    chat-id
                                                           :path   [name]
                                                           :result %}])))})))))
-
-(u/register-handler :set-in-bot-db
-  (re-frame/after check-subscriptions)
-  (fn [{:keys [current-chat-id] :as db} [_ {:keys [bot path value]}]]
-    (let [bot (or bot current-chat-id)]
-      (assoc-in db (concat [:bot-db bot] path) value))))
 
 (u/register-handler :register-bot-subscription
   (fn [db [_ {:keys [bot subscriptions] :as opts}]]

@@ -44,7 +44,7 @@
   (fn [data]
     ;; For details on passed data
     ;; https://facebook.github.io/react-native/docs/sectionlist.html#rendersectionheader
-    (let [{:keys [isection]} (js->clj data :keywordize-keys true)]
+    (let [{:keys [section]} (js->clj data :keywordize-keys true)]
       (r/as-element (f section)))))
 
 (defn section-list
