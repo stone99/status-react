@@ -10,7 +10,8 @@
             [status-im.test.utils.clocks]
             [status-im.test.utils.erc20]
             [status-im.test.utils.random]
-            [status-im.test.utils.gfycat.core]))
+            [status-im.test.utils.gfycat.core]
+            [status-im.test.utils.signing-phrase.core]))
 
 (enable-console-print!)
 
@@ -31,4 +32,5 @@
   'status-im.test.utils.clocks
   'status-im.test.utils.erc20
   'status-im.test.utils.random
-  'status-im.test.utils.gfycat.core)
+  'status-im.test.utils.gfycat.core
+  'status-im.test.utils.signing-phrase)
