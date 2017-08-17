@@ -16,6 +16,9 @@
    :flex-direction :row
    :margin-left    6})
 
+(def toolbar-title-inner-container
+  {:flex-direction :row})
+
 (def toolbar-title-text
   {:color        common/color-white
    :font-size    17

@@ -287,7 +287,6 @@
 
    ;wallet-qr-code
    :done                                  "Done"
-   :main-wallet                           "Main Wallet"
 
    ;validation
    :invalid-phone                         "Invalid phone number"
@@ -329,6 +328,9 @@
    :testfairy-message                     "You are using app installed from a nightly build. For testing purposes this build includes session recording if wifi connection is used, so all your interaction with app is saved (as video and log) and might be used by development team to investigate possible issues. Saved video/log do not include your passwords. Recording is done only if app is installed from a nightly build. Nothing is recorded if app is installed from PlayStore or TestFlight."
 
    ;; wallet
+   :wallets                               "Wallets"
+   :your-wallets                          "Your wallets"
+   :main-wallet                           "Main Wallet"
    :transactions                          "Transactions"
    :transactions-to                       "To"
    :transactions-sign                     "Sign"

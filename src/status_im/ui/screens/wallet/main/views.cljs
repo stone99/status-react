@@ -14,11 +14,13 @@
             [status-im.ui.screens.wallet.main.styles :as st]))
 
 (defn toolbar-title []
-  [rn/view {:style st/toolbar-title-container}
-   [rn/text {:style st/toolbar-title-text
-             :font  :toolbar-title}
-    "Main Wallet"]
-   [rn/icon :dropdown_white st/toolbar-title-icon]])
+  [rn/touchable-highlight {:on-press #(rf/dispatch [:navigate-to :wallet-list])
+                           :style st/toolbar-title-container}
+   [rn/view {:style st/toolbar-title-inner-container}
+    [rn/text {:style st/toolbar-title-text
+              :font  :toolbar-title}
+     "Main Wallet"]
+    [rn/icon :dropdown_white st/toolbar-title-icon]]])
 
 (defn toolbar-buttons []
   [rn/view {:style st/toolbar-buttons-container}
