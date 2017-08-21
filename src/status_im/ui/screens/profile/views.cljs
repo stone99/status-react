@@ -20,11 +20,11 @@
             [status-im.ui.screens.profile.styles :as styles]
             [status-im.utils.datetime :as time]
             [status-im.utils.utils :refer [hash-tag?]])
-  (:require-macros [status-im.utils.views :refer [defview]]))
+  (:require-macros [status-im.utils.views :refer [defview letsubs]]))
 
 (defn my-profile-toolbar []
   [toolbar {:actions [(actions/opts [{:value #(dispatch [:my-profile/edit])
-                                      :text (label :t/edit)}])]}])
+                                      :text  (label :t/edit)}])]}])
 
 (defn profile-toolbar [contact]
   [toolbar
@@ -46,7 +46,7 @@
    [my-profile-icon {:account contact
                      :edit?   false}]
    [react/view styles/profile-badge-name-container
-    [react/text {:style styles/profile-name-text
+    [react/text {:style           styles/profile-name-text
                  :number-of-lines 1}
      name]
     (when-not (nil? last-online)
@@ -99,7 +99,7 @@
 (defn profile-options [contact k text]
   (into []
         (concat [{:value (show-qr contact k)
-                  :text (label :t/show-qr)}]
+                  :text  (label :t/show-qr)}]
                 (when text
                   (share-options text)))))
 
@@ -122,7 +122,7 @@
 
 (defn tag-view [tag]
   [react/text {:style {:color color-blue}
-               :font :medium}
+               :font  :medium}
    (str tag " ")])
 
 (defn colorize-status-hashtags [status]
@@ -135,9 +135,9 @@
 
 (defn profile-info-phone-item [phone & [options]]
   (let [phone-empty? (or (nil? phone) (string/blank? phone))
-        phone-text  (if phone-empty?
-                      (label :t/not-specified)
-                      phone)]
+        phone-text   (if phone-empty?
+                       (label :t/not-specified)
+                       phone)]
     [profile-info-item {:label        (label :t/phone-number)
                         :value        phone-text
                         :options      options
@@ -160,7 +160,7 @@
    [profile-info-phone-item
     phone
     [{:value #(dispatch [:my-profile/change-phone-number])
-      :text (label :t/edit)}]]])
+      :text  (label :t/edit)}]]])
 
 (defn profile-status [status & [edit?]]
   [react/view styles/profile-status-container
@@ -174,6 +174,14 @@
        [react/view
         [react/text {:style styles/profile-status-text}
          (colorize-status-hashtags status)]]]])])
+
+(defn network-settings []
+  [react/touchable-highlight
+   {:on-press #(dispatch [:navigate-to :network-settings])}
+   [react/view styles/network-settings
+    [react/text {:style styles/network-settings-text}
+     (label :t/network-settings)]
+    [react/icon :forward_gray]]])
 
 (defview my-profile []
   (letsubs [{:keys [status] :as current-account} [:get-current-account]]
@@ -192,13 +200,14 @@
       [form-spacer]
       [react/view styles/profile-info-container
        [my-profile-info current-account]
+       [network-settings]
        [bottom-shadow]]]]))
 
 (defview profile []
   (letsubs [{:keys [pending?
                     status
                     whisper-identity]
-             :as contact} [:contact]
+             :as   contact} [:contact]
             chat-id [:get :current-chat-id]]
     [react/view styles/profile
      [status-bar]
