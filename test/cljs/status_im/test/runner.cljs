@@ -33,4 +33,4 @@
   'status-im.test.utils.erc20
   'status-im.test.utils.random
   'status-im.test.utils.gfycat.core
-  'status-im.test.utils.signing-phrase)
+  'status-im.test.utils.signing-phrase.core)

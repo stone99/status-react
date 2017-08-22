@@ -1,5 +1,4 @@
 (ns status-im.ui.screens.accounts.events
-<<<<<<< ef701ed17649f25878905a95ba1b0f9f08c6d500
   (:require
     status-im.ui.screens.accounts.login.events
     status-im.ui.screens.accounts.recover.events
@@ -16,6 +15,7 @@
     [status-im.utils.datetime :as time]
     [status-im.utils.handlers :refer [register-handler-db register-handler-fx get-hashtags] :as handlers]
     [status-im.ui.screens.accounts.statuses :as statuses]
+    [status-im.utils.signing-phrase.core :as signing-phrase]
     [status-im.utils.gfycat.core :refer [generate-gfy]]))
 
 ;;;; COFX
@@ -36,52 +36,13 @@
   ::save-account
   (fn [account]
     (accounts-store/save account true)))
-=======
-  (:require [status-im.data-store.accounts :as accounts-store]
-            [status-im.data-store.processed-messages :as processed-messages]
-            [re-frame.core :refer [reg-event-db after dispatch dispatch-sync debug]]
-            [taoensso.timbre :as log]
-            [status-im.protocol.core :as protocol]
-            [status-im.components.status :as status]
-            [status-im.utils.types :refer [json->clj]]
-            [status-im.utils.identicon :refer [identicon]]
-            [status-im.utils.random :as random]
-            [status-im.i18n :refer [label]]
-            [status-im.constants :refer [content-type-command-request console-chat-id]]
-            status-im.ui.screens.accounts.login.events
-            status-im.ui.screens.accounts.recover.events
-            [clojure.string :as str]
-            [status-im.utils.datetime :as time]
-            [status-im.utils.handlers :as u :refer [get-hashtags]]
-            [status-im.utils.signing-phrase.core :as signing-phrase]
-            [status-im.ui.screens.accounts.statuses :as statuses]
-            [status-im.utils.gfycat.core :refer [generate-gfy]]
-            [status-im.utils.scheduler :as s]
-            [status-im.protocol.message-cache :as cache]
-            [status-im.ui.screens.navigation :as nav]))
-
-(defn save-account
-  [{:keys [network]} [_ account]]
-  (accounts-store/save (assoc account :network network) true))
-
-(defn update-account
-  [{:keys [network] :as db} [_ {:keys [address] :as account}]]
-  (let [account' (assoc account :network network)]
-    (update db :accounts assoc address account')))
-
-(reg-event-db
-  :add-account
-  (u/handlers->
-    update-account
-      save-account))
->>>>>>> #1585 generate signing phrase, show it to the user during on-boarding, store in the account; account schema updated, added migration
 
 (defn account-created [result password]
   (let [data (json->clj result)
         public-key (:pubkey data)
-<<<<<<< ef701ed17649f25878905a95ba1b0f9f08c6d500
         address (:address data)
         mnemonic (:mnemonic data)
+        phrase     (signing-phrase/generate)
         {:keys [public private]} (protocol/new-keypair!)
         account {:public-key          public-key
                  :address             address
@@ -90,22 +51,8 @@
                  :signed-up?          true
                  :updates-public-key  public
                  :updates-private-key private
-                 :photo-path          (identicon public-key)}]
-=======
-        address    (:address data)
-        mnemonic   (:mnemonic data)
-        phrase     (signing-phrase/generate)
-        {:keys [public private]} (protocol/new-keypair!)
-        account    {:public-key          public-key
-                    :address             address
-                    :name                (generate-gfy)
-                    :status              (rand-nth statuses/data)
-                    :signed-up?          true
-                    :updates-public-key  public
-                    :updates-private-key private
-                    :photo-path          (identicon public-key)
-                    :signing-phrase      phrase}]
->>>>>>> #1585 generate signing phrase, show it to the user during on-boarding, store in the account; account schema updated, added migration
+                 :photo-path          (identicon public-key)
+                 :signing-phrase      phrase}]
     (log/debug "account-created")
     (when-not (str/blank? public-key)
       (dispatch [:show-mnemonic mnemonic phrase])
