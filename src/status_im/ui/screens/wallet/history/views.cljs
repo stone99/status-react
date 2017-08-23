@@ -54,12 +54,12 @@
 
 (defn- unsigned? [state] (= "unsigned" state))
 
-(defn transaction-details [{:keys [to state] {:keys [value symbol]} :content :as m}]
+(defn transaction-details [{:keys [value symbol to] :as m}]
   [rn/view {:style list-st/item-text-view}
    [rn/text {:style list-st/primary-text} (str value " " symbol)]
    [rn/text {:style list-st/secondary-text :ellipsize-mode "middle" :number-of-lines 1} (str (i18n/label :t/transactions-to) " " to)]
-   (if (unsigned? state)
-     [action-buttons m])])
+   #_(if (unsigned? state))
+   [action-buttons m]])
 
 (defn render-transaction [m]
   [rn/view {:style list-st/item}
@@ -72,19 +72,19 @@
   [rn/text {:style list-st/section-header} (:title m)])
 
 (def dummy-transaction-data
-  [{:to "0x829bd824b016326a401d083b33d092293333a830" :content {:value "0,4909" :symbol "ETH"} :state :unsigned}
+  [{:to "0x829bd824b016326a401d083b33d092293333a830" :content {:value "0,4908" :symbol "ETH"} :state :unsigned}
    {:to "0x829bd824b016326a401d083b33d092293333a830" :content {:value "10000" :symbol "SGT"} :state :unsigned}
    {:to "0x829bd824b016326a401d083b33d092293333a830" :content {:value "10000" :symbol "SGT"} :state :unsigned}])
 
 (def dummy-transaction-data-sorted
   [{:title "Postponed"
     :key :postponed
-    :data [{:to "0x829bd824b016326a401d083b33d092293333a830" :content {:value "0,4909" :symbol "ETH"} :state :pending}
+    :data [{:to "0x829bd824b016326a401d083b33d092293333a830" :content {:value "0,4908" :symbol "ETH"} :state :pending}
            {:to "0x829bd824b016326a401d083b33d092293333a830" :content {:value "10000" :symbol "SGT"} :state :pending}
            {:to "0x829bd824b016326a401d083b33d092293333a830" :content {:value "10000" :symbol "SGT"} :state :sent}]}
    {:title "Pending"
     :key :pending
-    :data [{:to "0x829bd824b016326a401d083b33d092293333a830" :content {:value "0,4909" :symbol "ETH"} :state :pending}
+    :data [{:to "0x829bd824b016326a401d083b33d092293333a830" :content {:value "0,4908" :symbol "ETH"} :state :pending}
            {:to "0x829bd824b016326a401d083b33d092293333a830" :content {:value "10000" :symbol "SGT"} :state :pending}
            {:to "0x829bd824b016326a401d083b33d092293333a830" :content {:value "10000" :symbol "SGT"} :state :sent}]}])
 
@@ -98,8 +98,9 @@
    {:empty-component (empty-text (i18n/label :t/transactions-history-empty))}])
 
 (defview unsigned-list []
-  [list/flat-list dummy-transaction-data render-transaction
-   {:empty-component (empty-text (i18n/label :t/transactions-unsigned-empty))}])
+  (letsubs [all-transactions [:transactions]]
+    [list/flat-list all-transactions render-transaction
+     {:empty-component (empty-text (i18n/label :t/transactions-unsigned-empty))}]))
 
 (def tab-list
   [{:view-id :wallet-transactions-unsigned

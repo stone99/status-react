@@ -70,6 +70,6 @@
    (.log js/console "Unable to get balance: " err)))
 
 (handlers/register-handler-fx
- :update-prices-fail
- (fn [_ [_ err]]
-   (.log js/console "Unable to get prices: " err)))
+  :update-prices-fail
+  (fn [_ [_ err]]
+    (.log js/console "Unable to get prices: " err)))
