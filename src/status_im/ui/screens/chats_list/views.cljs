@@ -26,7 +26,8 @@
             [status-im.ui.screens.chats-list.views.inner-item :refer [chat-list-item-inner-view]]
             [status-im.ui.screens.chats-list.styles :as st]
             [status-im.i18n :refer [label]]
-            [status-im.utils.platform :refer [platform-specific ios?]]))
+            [status-im.utils.platform :refer [platform-specific ios?]]
+            [status-im.react-native.js-dependencies :refer [react-native-fcm fcm]]))
 
 (def android-toolbar-popup-options
   [{:text (label :t/edit) :value #(dispatch [:set-in [:chat-list-ui-props :edit?] true])}])
@@ -87,6 +88,10 @@
        edit?   [toolbar-edit]
        search? [toolbar-search]
        :else   [toolbar-view])
+     ;; XXX
+     ;; (println "*** chats list" fcm)
+     (.-requestPermissions fcm)
+     (text "Hello there")
      [list-view {:dataSource      (to-datasource chats)
                  :renderRow       (fn [[id :as row] _ _]
                                     (list-item ^{:key id} [chat-list-item row edit?]))

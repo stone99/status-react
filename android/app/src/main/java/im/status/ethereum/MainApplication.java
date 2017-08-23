@@ -7,6 +7,9 @@ import com.bitgo.randombytes.RandomBytesPackage;
 import com.cboy.rn.splashscreen.SplashScreenReactPackage;
 import com.centaurwarchief.smslistener.SmsListenerPackage;
 import com.facebook.react.ReactApplication;
+import com.tradle.react.UdpSocketsModule;
+import com.peel.react.TcpSocketsModule;
+import com.mapbox.reactnativemapboxgl.ReactNativeMapboxGLPackage;
 import com.evollu.react.fcm.FIRMessagingPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.facebook.react.ReactNativeHost;
@@ -44,6 +47,9 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
         protected List<ReactPackage> getPackages() {
             List<ReactPackage> packages = new ArrayList<ReactPackage>(Arrays.asList(
                     new MainReactPackage(),
+            new UdpSocketsModule(),
+            new TcpSocketsModule(),
+            new ReactNativeMapboxGLPackage(),
             new FIRMessagingPackage(),
                     new HttpServerReactPackage(),
                     new NfcReactNativePackage(),

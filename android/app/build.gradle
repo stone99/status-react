@@ -162,6 +162,9 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-udp')
+    compile project(':react-native-tcp')
+    compile project(':react-native-mapbox-gl')
     compile project(':react-native-fcm')
     compile 'com.android.support:multidex:1.0.1'
     compile project(':react-native-http-bridge')

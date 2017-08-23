@@ -32,4 +32,18 @@
 (def vector-icons           (js/require "react-native-vector-icons/Ionicons"))
 (def webview-bridge         (js/require "react-native-webview-bridge"))
 
+(.log js/console "*******PREALL")
+;; how is this different?
+;;(def fcm                 (js/require "react-native-fcm"))
+;; this should work, damnit
+(def react-native-fcm (js/require "react-native-fcm"))
+(.log js/console "*******RN-FCM")
+(def fcm (aget react-native-fcm "default"))
+;; wtf woudl this do
+;; ok this right actually
+(.log js/console "*******FCM")
+;;(assert react-native-fcm)
+;;(assert fcm)
+;;(.-requestPermissions fcm)
 
+;; XXX: is this different? possibly
