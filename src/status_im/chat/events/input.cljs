@@ -214,6 +214,38 @@
            (get-in command [:command :sequential-params]))
       (merge (chat-input-focus new-db :seq-input-ref)))))
 
+(defn select-chat-input-command
+  "Selects command + (optional) arguments as input for active chat"
+  [{:keys [current-chat-id chat-ui-props] :as db}
+   {:keys [prefill prefill-bot-db sequential-params name] :as command} metadata prevent-auto-focus?]
+  (let [fx (-> db
+               bots-model/clear-bot-db
+               (model/set-chat-ui-props {:show-suggestions?   false
+                                         :result-box          nil
+                                         :validation-messages nil
+                                         :prev-command        name})
+               (set-chat-input-metadata metadata)
+               (set-chat-input-text (str (chat-utils/command-name command)
+                                         const/spacing-char
+                                         (when-not sequential-params
+                                           (input-model/join-command-args prefill))))
+               (as-> fx'
+                   (merge fx' (load-chat-parameter-box (:db fx') command))))]
+    (cond-> fx
+      prefill-bot-db (bots-model/update-bot-db {:db prefill-bot-db})
+
+      (not (and sequential-params
+                prevent-auto-focus?))
+      (merge (chat-input-focus (:db fx) :input-ref))
+
+      sequential-params
+      (as-> fx'
+          (cond-> (update fx' :db
+                          set-chat-seq-arg-input-text
+                          (str/join const/spacing-char prefill))
+            (not prevent-auto-focus?)
+            (merge fx' (chat-input-focus (:db fx') :seq-input-ref)))))))
+
 ;;;; Handlers
 
 (register-handler-db
@@ -236,34 +268,8 @@
 (register-handler-fx
  :select-chat-input-command
  [trim-v]
- (fn [{{:keys [current-chat-id chat-ui-props] :as db} :db}
-      [{:keys [prefill prefill-bot-db sequential-params name] :as command} metadata prevent-auto-focus?]]
-   (let [fx (-> db
-                (set-chat-input-metadata metadata)
-                (set-chat-input-text (str (chat-utils/command-name command)
-                                          const/spacing-char
-                                          (when-not sequential-params
-                                            (input-model/join-command-args prefill)))))]
-     (cond-> (assoc fx :dispatch-n [[:clear-bot-db]
-                                    [:set-chat-ui-props {:show-suggestions?   false
-                                                         :result-box          nil
-                                                         :validation-messages nil
-                                                         :prev-command        name}]
-                                    [:load-chat-parameter-box command 0]])
-
-       prefill-bot-db
-       (update :dispatch-n conj [:update-bot-db {:bot current-chat-id
-                                                 :db prefill-bot-db}])
-
-       (not (and sequential-params
-                 prevent-auto-focus?))
-       (update :dispatch-n conj [:chat-input-focus :input-ref])
-
-       sequential-params
-       (assoc :dispatch-later (cond-> [{:ms 100 :dispatch [:set-chat-seq-arg-input-text
-                                                           (str/join const/spacing-char prefill)]}]
-                                (not prevent-auto-focus?)
-                                (conj {:ms 100 :dispatch [:chat-input-focus :seq-input-ref]})))))))
+ (fn [{:keys [db]} [command metadata prevent-auto-focus?]]
+   (select-chat-input-command db command metadata prevent-auto-focus?)))
 
 (register-handler-db
  :set-chat-input-metadata
@@ -530,3 +536,11 @@
    (-> (set-command-argument db arg-index name true)
        (update :db bots-model/set-in-bot-db {:path [:public (keyword bot-db-key)]
                                              :value contact}))))
+
+(register-handler-fx
+ :show-suggestions
+ (fn [{:keys [db]} _]
+   (-> db
+       (model/toggle-chat-ui-prop :show-suggestions?)
+       (model/set-chat-ui-props {:validation-messages nil})
+       update-suggestions)))

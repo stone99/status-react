@@ -1,5 +1,5 @@
 (ns status-im.bots.handlers
-  (:require [re-frame.core :as re-frame] 
+  (:require [re-frame.core :as re-frame]
             [status-im.components.status :as status]
             [status-im.utils.handlers :as u]))
 
@@ -60,12 +60,3 @@
                     :value returned}]
           (re-frame/dispatch [:set-in-bot-db opts]))))))
 
-(u/register-handler :update-bot-db
-  (fn [{:keys [current-chat-id] :as app-db} [_ {:keys [bot db]}]]
-    (let [bot (or bot current-chat-id)]
-      (update-in app-db [:bot-db bot] merge db))))
-
-(u/register-handler :clear-bot-db
-  (fn [{:keys [current-chat-id] :as app-db} [_ {:keys [bot]}]]
-    (let [bot (or bot current-chat-id)]
-      (assoc-in app-db [:bot-db bot] nil))))

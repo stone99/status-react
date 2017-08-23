@@ -41,9 +41,7 @@
    show-suggestions? [:show-suggestions?]]
   [view style/commands-root
    [view style/command-list-icon-container
-    [touchable-highlight {:on-press #(do (dispatch [:toggle-chat-ui-props :show-suggestions?])
-                                         (dispatch [:set-chat-ui-props {:validation-messages nil}])
-                                         (dispatch [:update-suggestions]))}
+    [touchable-highlight {:on-press #(dispatch [:show-suggestions])}
      [view style/commands-list-icon
       (if show-suggestions?
         [icon :close_gray style/close-commands-list-icon]

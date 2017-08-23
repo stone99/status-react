@@ -22,8 +22,8 @@
 (register-handler-db
  :toggle-chat-ui-props
  [trim-v]
- (fn [db [ui-element chat-id]]
-   (update-in db [:chat-ui-props chat-id ui-element] not)))
+ (fn [db [ui-element]]
+   (model/toggle-chat-ui-prop db ui-element)))
 
 (register-handler-db
  :show-message-details

@@ -10,3 +10,9 @@
  [trim-v]
  (fn [db [params]]
    (bots-model/set-in-bot-db db params)))
+
+(register-handler-db
+ :update-bot-db
+ [trim-v]
+ (fn [db [params]]
+   (bots-model/update-bot-db db params)))
