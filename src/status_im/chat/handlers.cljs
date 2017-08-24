@@ -26,8 +26,8 @@
             [status-im.utils.types :refer [json->clj]]
             [status-im.chat.utils :refer [console? not-console? safe-trim]]
             [status-im.utils.gfycat.core :refer [generate-gfy]]
-            status-im.chat.events.input
-            status-im.chat.events.commands
+            status-im.chat.events.input-old
+            status-im.chat.events.commands-old
             status-im.chat.handlers.animation
             status-im.chat.handlers.requests
             status-im.chat.handlers.unviewed-messages
