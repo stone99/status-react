@@ -95,7 +95,7 @@
                    [[] false])
            (first)))))
 
-(defn join-command-args [args]
+(defn join-command-args
   "Transforms a list of args to a string. The opposite of `split-command-args`.
 
   Examples:
@@ -107,6 +107,7 @@
 
   Input:  ['/send' 'Complex name with space in between' '1.0']
   Output: '/send \"Complex name with space in between\" 1.0'"
+  [args]
   (when args
     (->> args
          (map (fn [arg]
@@ -183,7 +184,7 @@
         input-text    (get-in db [:chats chat-id :input-text])
         seq-arguments (get-in db [:chats chat-id :seq-arguments])
         selection     (get-in db [:chat-ui-props chat-id :selection])
-        chat-command  (selected-chat-command db chat-id)] 
+        chat-command  (selected-chat-command db chat-id)]
     (current-chat-argument-position chat-command input-text selection seq-arguments)))
 
 (defn command-completion

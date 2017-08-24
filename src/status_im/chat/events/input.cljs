@@ -535,7 +535,20 @@
  (fn [{:keys [db]} [bot-db-key contact arg-index name]]
    (-> (set-command-argument db arg-index name true)
        (update :db bots-model/set-in-bot-db {:path [:public (keyword bot-db-key)]
-                                             :value contact}))))
+                                             :value contact})
+       (as-> fx
+           (let [{:keys [current-chat-id]
+                  :as new-db}             (:db fx)
+                 arg-position             (input-model/argument-position new-db)
+                 input-text               (get-in new-db [:chats current-chat-id :input-text])
+                 command-args             (cond-> (input-model/split-command-args input-text)
+                                            (input-model/text-ends-with-space? input-text) (conj ""))
+                 new-selection            (->> command-args
+                                               (take (+ 3 arg-position))
+                                               (input-model/join-command-args)
+                                               count
+                                               (min (count input-text)))]
+             (merge fx (update-text-selection new-db new-selection)))))))
 
 (register-handler-fx
  :show-suggestions
