@@ -213,7 +213,7 @@
                (as-> fx'
                    (merge fx' (load-chat-parameter-box (:db fx') command))))]
     (cond-> fx
-      prefill-bot-db (bots-events/update-bot-db {:db prefill-bot-db})
+      prefill-bot-db (update :db bots-events/update-bot-db {:db prefill-bot-db})
 
       (not (and sequential-params
                 prevent-auto-focus?))
@@ -229,26 +229,28 @@
 
 (defn set-contact-as-command-argument
   "Sets contact as command argument for active chat"
-  [db {:keys [bot-db-key contact arg-index name]}]
-  (-> (set-command-argument db arg-index name true)
-      (as-> fx
-          (merge fx (bots-events/set-in-bot-db
-                     (:db fx)
-                     {:path [:public (keyword bot-db-key)]
-                      :value contact})))
-      (as-> fx
-          (let [{:keys [current-chat-id]
-                 :as new-db}             (:db fx)
-                arg-position             (input-model/argument-position new-db)
-                input-text               (get-in new-db [:chats current-chat-id :input-text])
-                command-args             (cond-> (input-model/split-command-args input-text)
-                                           (input-model/text-ends-with-space? input-text) (conj ""))
-                new-selection            (->> command-args
-                                              (take (+ 3 arg-position))
-                                              (input-model/join-command-args)
-                                              count
-                                              (min (count input-text)))]
-            (merge fx (update-text-selection new-db new-selection))))))
+  [db {:keys [bot-db-key contact arg-index]}]
+  (let [name    (str/replace (:name contact) (re-pattern const/arg-wrapping-char) "")
+        contact (select-keys contact [:address :whisper-identity :name :photo-path :dapp?])]
+    (-> (set-command-argument db arg-index name true)
+        (as-> fx
+            (merge fx (bots-events/set-in-bot-db
+                       (:db fx)
+                       {:path [:public (keyword bot-db-key)]
+                        :value contact})))
+        (as-> fx
+            (let [{:keys [current-chat-id]
+                   :as new-db}             (:db fx)
+                  arg-position             (input-model/argument-position new-db)
+                  input-text               (get-in new-db [:chats current-chat-id :input-text])
+                  command-args             (cond-> (input-model/split-command-args input-text)
+                                             (input-model/text-ends-with-space? input-text) (conj ""))
+                  new-selection            (->> command-args
+                                                (take (+ 3 arg-position))
+                                                (input-model/join-command-args)
+                                                count
+                                                (min (count input-text)))]
+              (merge fx (update-text-selection new-db new-selection)))))))
 
 ;;;; Handlers
 
