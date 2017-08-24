@@ -15,7 +15,10 @@
 (defn- select-contact [arg-index bot-db-key {:keys [name] :as contact}]
   (let [contact (select-keys contact [:address :whisper-identity :name :photo-path :dapp?])
         name    (str/replace name (re-pattern const/arg-wrapping-char) "")]
-    (dispatch [:set-contact-as-command-argument bot-db-key contact arg-index name])))
+    (dispatch [:set-contact-as-command-argument {:bot-db-key bot-db-key
+                                                 :contact contact
+                                                 :arg-index arg-index
+                                                 :name name}])))
 
 (defn render-row [arg-index bot-db-key]
   (fn [contact _ _]
