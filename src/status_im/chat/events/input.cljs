@@ -7,9 +7,8 @@
             [status-im.chat.models :as model]
             [status-im.chat.models.input :as input-model]
             [status-im.chat.models.suggestions :as suggestions-model]
-            [status-im.bots.models :as bots-model]
+            [status-im.bots.events :as bots-events]
             [status-im.components.react :as react-comp]
-            [status-im.components.status :as status]
             [status-im.utils.datetime :as time]
             [status-im.utils.handlers :refer [register-handler-db register-handler-fx]]
             [status-im.utils.random :as random]
@@ -55,30 +54,12 @@
  (fn [{:keys [ref props]}]
    (.setNativeProps ref (clj->js props))))
 
-(reg-fx
- :chat-fx/call-jail-function
- (fn [{:keys [chat-id function callback-events-creator] :as opts}]
-   (let [path   [:functions function]
-         params (select-keys opts [:parameters :context])]
-     (status/call-jail
-      {:jail-id chat-id
-       :path    path
-       :params  params
-       :callback (fn [jail-response]
-                   (doseq [event (if callback-events-creator
-                                   (callback-events-creator jail-response)
-                                   [[:received-bot-response
-                                     {:chat-id chat-id}
-                                     jail-response]])
-                           :when event]
-                     (dispatch event)))}))))
-
 ;;;; Helper functions
 
 (defn update-suggestions
   "Update suggestions for current chat input, takes db as the only argument
   and returns map with keys :db (new db with up-to-date suggestions) and (optionally)
-  :chat-fx/call-jail-function with jail function call params, if request to jail needs
+  :call-jail-function with jail function call params, if request to jail needs
   to be made as a result of suggestions update."
   [{:keys [chats current-chat-id current-account-id local-storage] :as db}]
   (let [chat-text       (str/trim (or (get-in chats [current-chat-id :input-text]) ""))
@@ -101,11 +82,11 @@
       (and dapp?
            (not (str/blank? chat-text))
            (every? empty? [requests commands]))
-      (assoc :chat-fx/call-jail-function {:chat-id    current-chat-id
-                                          :function   :on-message-input-change
-                                          :parameters {:message chat-text}
-                                          :context    {:data (get local-storage current-chat-id)
-                                                       :from current-account-id}}))))
+      (assoc :call-jail-function {:chat-id    current-chat-id
+                                  :function   :on-message-input-change
+                                  :parameters {:message chat-text}
+                                  :context    {:data (get local-storage current-chat-id)
+                                               :from current-account-id}}))))
 
 (defn set-chat-input-text
   "Set input text for current-chat and updates suggestions relevant to current input.
@@ -180,15 +161,15 @@
                                          :from current-account-id
                                          :to   to}
                                         (input-model/command-dependent-context-params current-chat-id command))}]
-        {:chat-fx/call-jail {:jail-id (or bot owner-id current-chat-id)
-                             :path    path
-                             :params  params
-                             :callback-events-creator (fn [jail-response]
-                                                        [[:received-bot-response
-                                                          {:chat-id         current-chat-id
-                                                           :command         command
-                                                           :parameter-index parameter-index}
-                                                          jail-response]])}}))))
+        {:call-jail {:jail-id (or bot owner-id current-chat-id)
+                     :path    path
+                     :params  params
+                     :callback-events-creator (fn [jail-response]
+                                                [[:received-bot-response
+                                                  {:chat-id         current-chat-id
+                                                   :command         command
+                                                   :parameter-index parameter-index}
+                                                  jail-response]])}}))))
 
 (defn chat-input-focus
   "Returns fx for focusing on active chat input reference"
@@ -219,7 +200,7 @@
   [{:keys [current-chat-id chat-ui-props] :as db}
    {:keys [prefill prefill-bot-db sequential-params name] :as command} metadata prevent-auto-focus?]
   (let [fx (-> db
-               bots-model/clear-bot-db
+               bots-events/clear-bot-db
                (model/set-chat-ui-props {:show-suggestions?   false
                                          :result-box          nil
                                          :validation-messages nil
@@ -232,7 +213,7 @@
                (as-> fx'
                    (merge fx' (load-chat-parameter-box (:db fx') command))))]
     (cond-> fx
-      prefill-bot-db (bots-model/update-bot-db {:db prefill-bot-db})
+      prefill-bot-db (bots-events/update-bot-db {:db prefill-bot-db})
 
       (not (and sequential-params
                 prevent-auto-focus?))
@@ -534,8 +515,11 @@
  [trim-v]
  (fn [{:keys [db]} [bot-db-key contact arg-index name]]
    (-> (set-command-argument db arg-index name true)
-       (update :db bots-model/set-in-bot-db {:path [:public (keyword bot-db-key)]
-                                             :value contact})
+       (as-> fx
+           (merge fx (bots-events/set-in-bot-db
+                      (:db fx)
+                      {:path [:public (keyword bot-db-key)]
+                       :value contact})))
        (as-> fx
            (let [{:keys [current-chat-id]
                   :as new-db}             (:db fx)
