@@ -279,6 +279,7 @@
  [trim-v]
  (fn [_ [{:keys [markup validationHandler parameters]} proceed-events]]
    (let [error-events-creator (fn [validator-result]
+                                (js/setTimeout #(dispatch [:set-chat-ui-props {:validation-messages nil}]) 2000)
                                 [[:set-chat-ui-props {:validation-messages  validator-result
                                                       :sending-in-progress? false}]])
          events (cond
