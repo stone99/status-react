@@ -11,6 +11,7 @@
             [status-im.utils.datetime :as time]
             [status-im.utils.handlers :refer [register-handler-db register-handler-fx]]
             [status-im.utils.random :as random]
+            [status-im.utils.types :as types]
             [status-im.i18n :as i18n]))
 
 ;;;; Coeffects
@@ -199,13 +200,13 @@
   :load-chat-parameter-box
   [trim-v]
   (fn [{{:keys [current-chat-id bot-db] :accounts/keys [current-account-id] :as db} :db}
-       [{:keys [name type bot owner-id] :as command}]]
+       [{:keys [name scope type bot owner-id] :as command}]]
     (let [parameter-index (input-model/argument-position db current-chat-id)]
       (when (and command (> parameter-index -1))
         (let [data    (get-in db [:local-storage current-chat-id])
               bot-db  (get bot-db (or bot current-chat-id))
               path    [(if (= :command type) :commands :responses)
-                       name
+                       [name scope]
                        :params
                        parameter-index
                        :suggestions]
@@ -350,6 +351,8 @@
                            :chat-id      chat-id
                            :jail-id      (or owner-id jail-id)
                            :content      {:command (:name command)
+                                          :scope   (when (= (:to-message-id metadata) :any)
+                                                     (:scope command))
                                           :params  params
                                           :type    (:type command)}
                            :on-requested (fn [jail-response]

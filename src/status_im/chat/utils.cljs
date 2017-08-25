@@ -48,11 +48,13 @@
     (validator message)
     (pos? (count message))))
 
-(defn command-name [{:keys [bot name]}]
+(defn command-name [{:keys [bot name scope]}]
   (cond
     (bots-constants/mailman-bot? bot)
     (str const/command-char name)
 
-    bot (str const/bot-char name)
+    (:global? scope)
+    (str const/bot-char name)
 
-    :else (str const/command-char name)))
+    :default
+    (str const/command-char name)))

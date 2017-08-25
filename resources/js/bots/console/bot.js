@@ -493,7 +493,6 @@ var phoneConfig = {
     }
 };
 status.response(phoneConfig);
-status.command(phoneConfig);
 
 var faucets = [
     /*{

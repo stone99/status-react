@@ -32,7 +32,7 @@
    {:on-press    #(let [{:keys [params]} (messages/get-message-content-by-id message-id)
                         metadata (assoc params :to-message-id message-id)]
                     (dispatch [:select-chat-input-command command metadata]))
-    :name        name
+    :name        (chat-utils/command-name command)
     :description description
     :last?       last?}])
 

@@ -3,13 +3,14 @@
             [clojure.string :as str]
             [re-frame.core :refer [reg-fx reg-cofx inject-cofx dispatch trim-v]]
             [taoensso.timbre :as log]
-            [status-im.data-store.messages :as msg-store]
-            [status-im.utils.handlers :refer [register-handler-fx]]
-            [status-im.components.status :as status]
             [status-im.chat.constants :as const]
+            [status-im.components.status :as status]
             [status-im.commands.utils :as commands-utils]
+            [status-im.data-store.messages :as msg-store]
             [status-im.i18n :as i18n]
-            [status-im.utils.platform :as platform]))
+            [status-im.utils.handlers :refer [register-handler-fx]]
+            [status-im.utils.platform :as platform]
+            [status-im.utils.types :as types]))
 
 ;;;; Helper fns
 
@@ -69,7 +70,9 @@
   :request-command-data
   [trim-v]
   (fn [{:keys [db]}
-       [{{:keys [command content-command params type bot]} :content
+       ;; TODO(alwx): check content params
+       ;; TODO(alwx): rename `command` to `command-name`
+       [{{:keys [command content-command scope params type bot]} :content
          :keys [chat-id jail-id] :as message}
         data-type]]
     (let [{:keys [chats]
@@ -81,8 +84,7 @@
                     jail-id)]
       (if (get-in contacts [jail-id :commands-loaded?])
         (let [path          [(if (= :response (keyword type)) :responses :commands)
-                             ;;TODO(alwx): !!! merge it with scopes
-                             [(if content-command content-command command) nil]
+                             [(if content-command content-command command) scope]
                              data-type]
               to            (get-in contacts [chat-id :address])
               jail-params   {:parameters params

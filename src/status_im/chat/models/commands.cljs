@@ -47,21 +47,25 @@
        (into [{:identity "mailman"}])
        (map (fn [{:keys [identity]}]
               (let [commands (get-in db [:contacts/contacts identity :commands])]
-                (find-suggestions commands text))))))
+                (find-suggestions commands text))))
+       (flatten)))
 
 (defn get-global-command-suggestions
   [{:keys [global-commands] :as db} text]
   (find-suggestions chat-consts/bot-char :name global-commands text))
 
 (defn commands-for-chat
-  [{:keys          [accounts current-account-id global-commands chats]
+  [{:keys          [global-commands chats]
     :contacts/keys [contacts]
+    :accounts/keys [accounts current-account-id]
     :as            db} chat-id text]
   (let [global-commands (get-global-command-suggestions db text)
         commands        (get-command-suggestions db text)
         account         (get accounts current-account-id)
-        {chat-contacts :contacts} (get chats chat-id)]
-    (->> (into global-commands commands)
+        {chat-contacts :contacts} (get chats chat-id)
+        commands        (-> (into [] global-commands)
+                            (into commands))]
+    (->> commands
          (remove (fn [{:keys [scope]}]
                    (or
                      (and (:registered-only? scope)

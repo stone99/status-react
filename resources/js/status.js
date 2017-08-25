@@ -12,7 +12,7 @@ function Response() {
 }
 
 Command.prototype.addToCatalog = function () {
-    _status_catalog.commands[[this.name, JSON.stringify(this.scope)]] = this;
+    _status_catalog.commands[[this.name, this.scope]] = this;
 };
 
 Command.prototype.param = function (parameter) {

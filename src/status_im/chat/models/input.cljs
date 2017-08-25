@@ -136,14 +136,14 @@
          command-args     (split-command-args input-text)
          command-name     (first command-args)]
      (when (starts-as-command? (or command-name ""))
-       (when-let [{{:keys [message-id]} :request :as command}
+       (when-let [[{{:keys [message-id]} :request :as command} to-message-id]
                   (->> possible-actions
                        (filter (fn [[{:keys [name]} _]]
                                  (= name (subs command-name 1))))
                        (first))]
-         {:command  (first command)
+         {:command  command
           :metadata (if (and (nil? (:to-message-id input-metadata)) (not= :any message-id))
-                      (assoc input-metadata :to-message-id message-id)
+                      (assoc input-metadata :to-message-id to-message-id)
                       input-metadata)
           :args     (if (empty? seq-arguments)
                       (rest command-args)

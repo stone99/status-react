@@ -9,7 +9,6 @@
                                          content-type-status
                                          console-chat-id]]
             [status-im.commands.utils :as commands-utils]
-            [status-im.models.commands :as commands]
             [status-im.utils.platform :refer [platform-specific ios?]]
             [taoensso.timbre :as log]
             [clojure.string :as str]))

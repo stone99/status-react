@@ -22,6 +22,9 @@
             [status-im.utils.types :as types]
             [status-im.utils.clocks :as clocks]))
 
+;; TODO(alwx): REMEMBER!
+;; `requests` don't have scope
+
 (defn prepare-command
   [identity chat-id clock-value
    {request-params  :params
@@ -35,7 +38,7 @@
                     :prefill        prefill
                     :prefill-bot-db prefillBotDb}
                    {:command (:name command)
-                    :scope   (:scope scope)
+                    :scope   (:scope command)
                     :params  params})
         content' (assoc content :handler-data handler-data
                                 :type (name (:type command))
@@ -146,7 +149,7 @@
                      id]} :command
              :keys        [chat-id address]
              :as          orig-params}]]
-      (let [{:keys [type name bot owner-id]} command
+      (let [{:keys [type name scope bot owner-id]} command
             handler-type (if (= :command type) :commands :responses)
             to           (get-in contacts [chat-id :address])
             identity     (or owner-id bot chat-id)
@@ -161,7 +164,7 @@
            identity
            #(status/call-jail
               {:jail-id  identity
-               :path     [handler-type name :handler]
+               :path     [handler-type [name scope] :handler]
                :params   params
                :callback (fn [res]
                            (dispatch [:command-handler! chat-id orig-params res]))})])))))
