@@ -3,6 +3,8 @@
 
 # Status - a Mobile Ethereum Operating System
 
+[![Join the chat at https://gitter.im/status-react/Lobby](https://badges.gitter.im/status-react/Lobby.svg)](https://gitter.im/status-react/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Join us in creating a browser, messenger, and gateway to a decentralized world. Status is a free (libre) open source mobile client targeting Android & iOS built entirely on [Ethereum](https://ethereum.org/) technologies. That's right, no middle men and `go-ethereum` running directly on your device.
 
 [![Getting started with Status](https://i.imgur.com/C0aZZEL.jpg)](https://www.youtube.com/watch?v=oDCSEmS9c3o "Getting started with Status")
